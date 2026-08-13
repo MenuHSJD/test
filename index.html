@@ -30,7 +30,7 @@ video {
     autoplay
     muted
     controls
-    preferredcaptions="pid=1735;;">
+    preferredcaptions="pid=1735;lang=cat">
 </video>
 
 <script>
@@ -38,6 +38,40 @@ video {
 const player = document.getElementById("player");
 
 player.src = "udp://239.255.0.9:1234";
+
+console.log("Loading stream:", player.src);
+
+player.addEventListener("loadedmetadata", function () {
+    console.log("Metadata loaded");
+});
+
+player.addEventListener("playing", function () {
+    console.log("Playback started");
+});
+
+player.addEventListener("error", function (e) {
+    console.log("Video error:", e);
+});
+
+setInterval(() => {
+
+    console.log("Text tracks detected:", player.textTracks.length);
+
+    for(let i = 0; i < player.textTracks.length; i++) {
+
+        console.log(
+            "Track:",
+            i,
+            "lang:",
+            player.textTracks[i].language,
+            "kind:",
+            player.textTracks[i].kind,
+            "mode:",
+            player.textTracks[i].mode
+        );
+    }
+
+}, 5000);
 
 </script>
 
