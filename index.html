@@ -2,14 +2,16 @@
 <html>
 <head>
 <meta charset="utf-8">
-<title>IPTV Test</title>
+<title>IPTV DVB Subtitle Test</title>
 
 <style>
 html, body {
     margin: 0;
+    padding: 0;
     width: 100%;
     height: 100%;
     background: black;
+    overflow: hidden;
 }
 
 video {
@@ -26,19 +28,50 @@ video {
     id="player"
     autoplay
     muted
-    controls>
+    controls
+    preferredcaptions="pid=1735;lang=cat">
 </video>
 
 <script>
+
 const player = document.getElementById("player");
 
 player.src = "udp://239.255.0.9:1234";
 
-console.log("Loading stream");
+console.log("Loading stream:", player.src);
 
-player.addEventListener("error", function(e){
-    console.log("Video error", e);
+player.addEventListener("loadedmetadata", function () {
+    console.log("Metadata loaded");
 });
+
+player.addEventListener("playing", function () {
+    console.log("Playback started");
+});
+
+player.addEventListener("error", function (e) {
+    console.log("Video error:", e);
+});
+
+setInterval(() => {
+
+    console.log("Text tracks detected:", player.textTracks.length);
+
+    for(let i = 0; i < player.textTracks.length; i++) {
+
+        console.log(
+            "Track:",
+            i,
+            "lang:",
+            player.textTracks[i].language,
+            "kind:",
+            player.textTracks[i].kind,
+            "mode:",
+            player.textTracks[i].mode
+        );
+    }
+
+}, 5000);
+
 </script>
 
 </body>
