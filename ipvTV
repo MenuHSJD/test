@@ -7,15 +7,17 @@
 <style>
 html, body {
     margin: 0;
+    padding: 0;
     width: 100%;
     height: 100%;
-    background: black;
+    background: #000;
+    overflow: hidden;
 }
 
-video {
+#player {
     width: 100%;
     height: 100%;
-    background: black;
+    background: #000;
 }
 </style>
 
@@ -30,17 +32,23 @@ video {
 </video>
 
 <script>
-
 const player = document.getElementById("player");
 
 player.src = "udp://239.255.0.9:1234";
 
-console.log("loading stream");
+console.log("Loading stream:", player.src);
 
-player.addEventListener("error", function(e){
-    console.log("video error", e);
+player.addEventListener("error", function(event) {
+    console.log("Video error:", event);
 });
 
+player.addEventListener("loadedmetadata", function() {
+    console.log("Metadata loaded");
+});
+
+player.addEventListener("playing", function() {
+    console.log("Playback started");
+});
 </script>
 
 </body>
