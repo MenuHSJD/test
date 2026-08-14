@@ -165,16 +165,23 @@ function dumpTracks() {
                 " mode=" + t.mode
             );
 
-            try {
+           try {
 
-                t.mode = "showing";
+    t.mode = "showing";
 
-                log(
-                    "TEXT[" + i + "] mode changed to showing"
-                );
+    if (typeof t.enabled !== "undefined") {
+        t.enabled = true;
+    }
 
-            } catch(e) {
+    log(
+        "TEXT[" + i + "] mode changed to showing"
+    );
 
+    player.dispatchEvent(
+        new Event("resize")
+    );
+
+} catch(e) {
                 log(
                     "TEXT[" + i + "] activation failed: " + e
                 );
