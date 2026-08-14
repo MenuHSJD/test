@@ -66,7 +66,7 @@ player.src = STREAM_URL;
     "error"
 ].forEach(evt => {
 
-    player.addEventListener(evt, function(e) {
+    player.addEventListener(evt, function() {
 
         log(
             "EVENT: " + evt +
@@ -220,67 +220,45 @@ player.play()
     log("play() FAILED: " + err);
 });
 
-// ====================================================
-// FORZADO CONTINUO DE SUBTÍTULOS
-// ====================================================
+// ====================================
+// FORZADO SIMPLE DE SUBTÍTULOS
+// ====================================
 
 function forceSubtitles() {
 
-    const tracks = player.textTracks;
+    try {
 
-    if (!tracks || tracks.length === 0) {
-
-        log("FORCE: no subtitle tracks");
-
-        return;
-    }
-
-    for (let i = 0; i < tracks.length; i++) {
-
-        try {
-
-            const lang =
-                (tracks[i].language || "").toLowerCase();
-
-            if (
-                lang === "cat" ||
-                lang === "ca" ||
-                lang === "catalan"
-            ) {
-
-                tracks[i].mode = "showing";
-
-                log(
-                    "CAT SUBTITLE FORCED | TRACK " +
-                    i +
-                    " | MODE=" +
-                    tracks[i].mode
-                );
-
-            } else {
-
-                tracks[i].mode = "disabled";
-
-                log(
-                    "NON-CAT TRACK DISABLED | TRACK " +
-                    i +
-                    " | LANG=" +
-                    lang
-                );
-
-            }
-
-        } catch(err) {
-
-            log(
-                "FORCE ERROR TRACK[" +
-                i +
-                "] => " +
-                err
-            );
+        if (!player.textTracks) {
+            return;
         }
+
+        for (let i = 0; i < player.textTracks.length; i++) {
+
+            try {
+
+                player.textTracks[i].mode = "showing";
+
+                log(
+                    "FORCE TRACK[" + i + "] " +
+                    "LANG=" + player.textTracks[i].language +
+                    " MODE=" + player.textTracks[i].mode
+                );
+
+            } catch(e) {
+
+                log(
+                    "FORCE ERROR TRACK[" + i + "] " + e
+                );
+            }
+        }
+
+    } catch(err) {
+
+        log("FORCE SUBTITLE ERROR " + err);
     }
 }
 
-// Primera ejecución
-setTimeout(forceSubtitles
+// Comenzar a forzar 2 segundos después
+setTimeout(forceSubtitles, 2000);
+
+// Mantener activas las pistas 
