@@ -2,7 +2,7 @@
 <html>
 <head>
 <meta charset="utf-8">
-<title>HSJD IPTV DVB Subtitle Test</title>
+<title>HSJD IPTV DVB Diagnostics</title>
 
 <style>
 html, body {
@@ -10,14 +10,14 @@ html, body {
     padding: 0;
     width: 100%;
     height: 100%;
-    background: #000;
+    background: black;
     overflow: hidden;
 }
 
 #player {
     width: 100%;
     height: 100%;
-    background: #000;
+    background: black;
     object-fit: contain;
 }
 </style>
@@ -34,95 +34,191 @@ html, body {
 
 <script>
 
-const STREAM_URL = "udp://239.255.0.9:1234";
+const STREAM_URL = "udp://239.255.0.15:1234";
 const player = document.getElementById("player");
 
-console.log("=================================");
-console.log("HSJD IPTV DVB Subtitle Test");
-console.log("UserAgent:", navigator.userAgent);
-console.log("Stream:", STREAM_URL);
-console.log("=================================");
+function log(msg) {
+    console.log(new Date().toISOString() + " | " + msg);
+}
+
+log("========================================");
+log("HSJD IPTV DVB SUBTITLE TEST");
+log("UserAgent: " + navigator.userAgent);
+log("Stream: " + STREAM_URL);
+log("========================================");
 
 player.src = STREAM_URL;
 
-player.addEventListener("loadstart", () => {
-    console.log("[EVENT] loadstart");
+// Eventos principales
+
+[
+    "loadstart",
+    "loadedmetadata",
+    "loadeddata",
+    "canplay",
+    "canplaythrough",
+    "play",
+    "playing",
+    "pause",
+    "waiting",
+    "stalled",
+    "ended",
+    "error"
+].forEach(evt => {
+
+    player.addEventListener(evt, function(e) {
+
+        log(
+            "EVENT: " + evt +
+            " | readyState=" + player.readyState +
+            " | currentTime=" + player.currentTime
+        );
+
+        if (evt === "error" && player.error) {
+            log(
+                "MEDIA ERROR => code=" +
+                player.error.code
+            );
+        }
+
+    });
+
 });
 
-player.addEventListener("loadedmetadata", () => {
-    console.log("[EVENT] loadedmetadata");
-});
+function dumpTracks() {
 
-player.addEventListener("loadeddata", () => {
-    console.log("[EVENT] loadeddata");
-});
+    log("========== TRACK DUMP ==========");
 
-player.addEventListener("canplay", () => {
-    console.log("[EVENT] canplay");
-});
+    try {
 
-player.addEventListener("playing", () => {
-    console.log("[EVENT] playing");
-});
+        if (player.audioTracks) {
 
-player.addEventListener("pause", () => {
-    console.log("[EVENT] pause");
-});
+            log("audioTracks.length = " +
+                player.audioTracks.length);
 
-player.addEventListener("error", (e) => {
-    console.log("[EVENT] error", e);
-});
+            for (let i = 0; i < player.audioTracks.length; i++) {
 
-function scanTracks() {
+                let t = player.audioTracks[i];
 
-    console.log("========== TRACK SCAN ==========");
+                log(
+                    "AUDIO[" + i + "]" +
+                    " enabled=" + t.enabled +
+                    " language=" + t.language +
+                    " label=" + t.label
+                );
+            }
 
-    const tracks = player.textTracks;
+        } else {
 
-    console.log("Tracks detected:", tracks.length);
+            log("audioTracks API not available");
+        }
 
-    if (tracks.length === 0) {
-        console.log("No subtitle tracks detected.");
+    } catch(err) {
+
+        log("audioTracks exception: " + err);
     }
 
-    for (let i = 0; i < tracks.length; i++) {
+    try {
 
-        const track = tracks[i];
+        if (player.videoTracks) {
 
-        console.log("Track:", i);
-        console.log("Language:", track.language);
-        console.log("Kind:", track.kind);
-        console.log("Label:", track.label);
-        console.log("Mode before:", track.mode);
+            log("videoTracks.length = " +
+                player.videoTracks.length);
 
-        try {
-            track.mode = "showing";
-            console.log("Mode after:", track.mode);
+            for (let i = 0; i < player.videoTracks.length; i++) {
+
+                let t = player.videoTracks[i];
+
+                log(
+                    "VIDEO[" + i + "]" +
+                    " selected=" + t.selected +
+                    " label=" + t.label
+                );
+            }
+
+        } else {
+
+            log("videoTracks API not available");
         }
-        catch(err) {
-            console.log("Unable to set track mode:", err);
-        }
+
+    } catch(err) {
+
+        log("videoTracks exception: " + err);
     }
 
-    console.log("================================");
+    try {
+
+        log(
+            "textTracks.length = " +
+            player.textTracks.length
+        );
+
+        for (let i = 0; i < player.textTracks.length; i++) {
+
+            let t = player.textTracks[i];
+
+            log(
+                "TEXT[" + i + "]" +
+                " language=" + t.language +
+                " kind=" + t.kind +
+                " label=" + t.label +
+                " mode=" + t.mode
+            );
+
+            try {
+
+                t.mode = "showing";
+
+                log(
+                    "TEXT[" + i + "] mode changed to showing"
+                );
+
+            } catch(e) {
+
+                log(
+                    "TEXT[" + i + "] activation failed: " + e
+                );
+            }
+        }
+
+    } catch(err) {
+
+        log("textTracks exception: " + err);
+    }
+
+    log("================================");
 }
 
-setTimeout(scanTracks, 5000);
-setTimeout(scanTracks, 10000);
-setInterval(scanTracks, 30000);
+// Escaneos periódicos
 
-try {
-    player.play()
-        .then(() => {
-            console.log("Autoplay OK");
-        })
-        .catch(err => {
-            console.log("Autoplay failed:", err);
-        });
-}
-catch(err) {
-    console.log("Play exception:", err);
-}
+setTimeout(dumpTracks, 5000);
+setTimeout(dumpTracks, 10000);
+setTimeout(dumpTracks, 20000);
+
+setInterval(dumpTracks, 30000);
+
+// Estado periódico
+
+setInterval(() => {
+
+    log(
+        "STATE" +
+        " readyState=" + player.readyState +
+        " currentTime=" + player.currentTime +
+        " paused=" + player.paused
+    );
+
+}, 10000);
+
+// Arranque
+
+player.play()
+.then(() => {
+    log("play() OK");
+})
+.catch(err => {
+    log("play() FAILED: " + err);
+});
 
 </script>
 
