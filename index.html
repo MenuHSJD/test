@@ -37,157 +37,35 @@ html, body {
 const STREAM_URL = "udp://239.255.0.15:1234";
 const player = document.getElementById("player");
 
-function log(msg) {
-    console.log(new Date().toISOString() + " | " + msg);
-}
-
-log("========================================");
-log("HSJD IPTV DVB SUBTITLE TEST");
-log("UserAgent: " + navigator.userAgent);
-log("Stream: " + STREAM_URL);
-log("========================================");
-
 player.src = STREAM_URL;
-
-// Eventos principales
-
-[
-    "loadstart",
-    "loadedmetadata",
-    "loadeddata",
-    "canplay",
-    "canplaythrough",
-    "play",
-    "playing",
-    "pause",
-    "waiting",
-    "stalled",
-    "ended",
-    "error"
-].forEach(evt => {
-
-    player.addEventListener(evt, function() {
-
-        log(
-            "EVENT: " + evt +
-            " | readyState=" + player.readyState +
-            " | currentTime=" + player.currentTime
-        );
-
-        if (evt === "error" && player.error) {
-            log(
-                "MEDIA ERROR => code=" +
-                player.error.code
-            );
-        }
-
-    });
-
-});
-
-// =====================================================
-// DUMP TRACKS
-// =====================================================
 
 function dumpTracks() {
 
-    log("========== TRACK DUMP ==========");
+    console.log(
+        "textTracks.length = " +
+        player.textTracks.length
+    );
 
-    try {
+    for (let i = 0; i < player.textTracks.length; i++) {
 
-        log(
-            "textTracks.length = " +
-            player.textTracks.length
+        const t = player.textTracks[i];
+
+        console.log(
+            "TEXT[" + i + "]" +
+            " language=" + t.language +
+            " kind=" + t.kind +
+            " label=" + t.label +
+            " mode=" + t.mode
         );
 
-        for (let i = 0; i < player.textTracks.length; i++) {
-
-            const t = player.textTracks[i];
-
-            log(
-                "TEXT[" + i + "]" +
-                " language=" + t.language +
-                " kind=" + t.kind +
-                " label=" + t.label +
-                " mode=" + t.mode
-            );
-
+        try {
+            t.mode = "showing";
         }
-
-    } catch(err) {
-
-        log("textTracks exception: " + err);
-    }
-
-    log("================================");
-}
-
-// =====================================================
-// FORZAR SUBTÍTULOS DVB
-// =====================================================
-
-function forceDvbSubtitles() {
-
-    try {
-
-        if (!player.textTracks) {
-            return;
+        catch(e) {
+            console.log(e);
         }
-
-        if (player.textTracks.length === 0) {
-            log("FORCE: no tracks");
-            return;
-        }
-
-        for (let i = 0; i < player.textTracks.length; i++) {
-
-            const t = player.textTracks[i];
-
-            try {
-
-                t.mode = "showing";
-
-                log(
-                    "FORCED TRACK[" + i + "] " +
-                    "LANG=" + t.language +
-                    " MODE=" + t.mode
-                );
-
-            } catch(e) {
-
-                log(
-                    "FORCE ERROR TRACK[" + i + "] " +
-                    e
-                );
-            }
-        }
-
-    } catch(err) {
-
-        log("FORCE ERROR " + err);
     }
 }
-
-// =====================================================
-// EVENTOS DE ACTIVACIÓN
-// =====================================================
-
-player.addEventListener("playing", () => {
-
-    log("PLAYING -> forcing subtitles");
-
-    forceDvbSubtitles();
-
-    setTimeout(forceDvbSubtitles, 500);
-    setTimeout(forceDvbSubtitles, 1000);
-    setTimeout(forceDvbSubtitles, 2000);
-    setTimeout(forceDvbSubtitles, 3000);
-
-});
-
-// =====================================================
-// TIMERS
-// =====================================================
 
 setTimeout(dumpTracks, 5000);
 setTimeout(dumpTracks, 10000);
@@ -195,32 +73,7 @@ setTimeout(dumpTracks, 20000);
 
 setInterval(dumpTracks, 30000);
 
-setInterval(() => {
-
-    log(
-        "STATE" +
-        " readyState=" + player.readyState +
-        " currentTime=" + player.currentTime +
-        " paused=" + player.paused
-    );
-
-}, 10000);
-
-// Fuerza continua
-
-setInterval(forceDvbSubtitles, 1000);
-
-// =====================================================
-// ARRANQUE
-// =====================================================
-
-player.play()
-.then(() => {
-    log("play() OK");
-})
-.catch(err => {
-    log("play() FAILED: " + err);
-});
+player.play();
 
 </script>
 
