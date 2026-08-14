@@ -29,7 +29,7 @@ html, body {
     id="player"
     autoplay
     controls
-    preferredcaptions="pid=1735;lang=cat">
+    preferredcaptions="pid=1720;lang=cat">
 </video>
 
 <script>
@@ -66,7 +66,7 @@ player.src = STREAM_URL;
     "error"
 ].forEach(evt => {
 
-    player.addEventListener(evt, function(e) {
+    player.addEventListener(evt, function() {
 
         log(
             "EVENT: " + evt +
@@ -85,66 +85,13 @@ player.src = STREAM_URL;
 
 });
 
+// =====================================================
+// DUMP TRACKS
+// =====================================================
+
 function dumpTracks() {
 
     log("========== TRACK DUMP ==========");
-
-    try {
-
-        if (player.audioTracks) {
-
-            log("audioTracks.length = " +
-                player.audioTracks.length);
-
-            for (let i = 0; i < player.audioTracks.length; i++) {
-
-                let t = player.audioTracks[i];
-
-                log(
-                    "AUDIO[" + i + "]" +
-                    " enabled=" + t.enabled +
-                    " language=" + t.language +
-                    " label=" + t.label
-                );
-            }
-
-        } else {
-
-            log("audioTracks API not available");
-        }
-
-    } catch(err) {
-
-        log("audioTracks exception: " + err);
-    }
-
-    try {
-
-        if (player.videoTracks) {
-
-            log("videoTracks.length = " +
-                player.videoTracks.length);
-
-            for (let i = 0; i < player.videoTracks.length; i++) {
-
-                let t = player.videoTracks[i];
-
-                log(
-                    "VIDEO[" + i + "]" +
-                    " selected=" + t.selected +
-                    " label=" + t.label
-                );
-            }
-
-        } else {
-
-            log("videoTracks API not available");
-        }
-
-    } catch(err) {
-
-        log("videoTracks exception: " + err);
-    }
 
     try {
 
@@ -155,7 +102,7 @@ function dumpTracks() {
 
         for (let i = 0; i < player.textTracks.length; i++) {
 
-            let t = player.textTracks[i];
+            const t = player.textTracks[i];
 
             log(
                 "TEXT[" + i + "]" +
@@ -165,27 +112,6 @@ function dumpTracks() {
                 " mode=" + t.mode
             );
 
-           try {
-
-    t.mode = "showing";
-
-    if (typeof t.enabled !== "undefined") {
-        t.enabled = true;
-    }
-
-    log(
-        "TEXT[" + i + "] mode changed to showing"
-    );
-
-    player.dispatchEvent(
-        new Event("resize")
-    );
-
-} catch(e) {
-                log(
-                    "TEXT[" + i + "] activation failed: " + e
-                );
-            }
         }
 
     } catch(err) {
@@ -196,15 +122,78 @@ function dumpTracks() {
     log("================================");
 }
 
-// Escaneos periódicos
+// =====================================================
+// FORZAR SUBTÍTULOS DVB
+// =====================================================
+
+function forceDvbSubtitles() {
+
+    try {
+
+        if (!player.textTracks) {
+            return;
+        }
+
+        if (player.textTracks.length === 0) {
+            log("FORCE: no tracks");
+            return;
+        }
+
+        for (let i = 0; i < player.textTracks.length; i++) {
+
+            const t = player.textTracks[i];
+
+            try {
+
+                t.mode = "showing";
+
+                log(
+                    "FORCED TRACK[" + i + "] " +
+                    "LANG=" + t.language +
+                    " MODE=" + t.mode
+                );
+
+            } catch(e) {
+
+                log(
+                    "FORCE ERROR TRACK[" + i + "] " +
+                    e
+                );
+            }
+        }
+
+    } catch(err) {
+
+        log("FORCE ERROR " + err);
+    }
+}
+
+// =====================================================
+// EVENTOS DE ACTIVACIÓN
+// =====================================================
+
+player.addEventListener("playing", () => {
+
+    log("PLAYING -> forcing subtitles");
+
+    forceDvbSubtitles();
+
+    setTimeout(forceDvbSubtitles, 500);
+    setTimeout(forceDvbSubtitles, 1000);
+    setTimeout(forceDvbSubtitles, 2000);
+    setTimeout(forceDvbSubtitles, 3000);
+
+});
+
+// =====================================================
+// TIMERS
+// =====================================================
 
 setTimeout(dumpTracks, 5000);
 setTimeout(dumpTracks, 10000);
 setTimeout(dumpTracks, 20000);
 
 setInterval(dumpTracks, 30000);
-
-// Estado periódico
 
 setInterval(() => {
 
@@ -217,7 +206,13 @@ setInterval(() => {
 
 }, 10000);
 
-// Arranque
+// Fuerza continua
+
+setInterval(forceDvbSubtitles, 1000);
+
+// =====================================================
+// ARRANQUE
+// =====================================================
 
 player.play()
 .then(() => {
