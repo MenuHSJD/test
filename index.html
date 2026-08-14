@@ -2,7 +2,7 @@
 <html>
 <head>
 <meta charset="utf-8">
-<title>IPTV DVB Subtitle Test</title>
+<title>HSJD IPTV DVB Subtitle Test</title>
 
 <style>
 html, body {
@@ -10,68 +10,119 @@ html, body {
     padding: 0;
     width: 100%;
     height: 100%;
-    background: black;
+    background: #000;
     overflow: hidden;
 }
 
-video {
+#player {
     width: 100%;
     height: 100%;
-    background: black;
+    background: #000;
     object-fit: contain;
 }
 </style>
-
 </head>
+
 <body>
 
 <video
     id="player"
     autoplay
-    muted
     controls
     preferredcaptions="pid=1735;lang=cat">
 </video>
 
 <script>
 
+const STREAM_URL = "udp://239.255.0.9:1234";
 const player = document.getElementById("player");
 
-player.src = "udp://239.255.0.9:1234";
+console.log("=================================");
+console.log("HSJD IPTV DVB Subtitle Test");
+console.log("UserAgent:", navigator.userAgent);
+console.log("Stream:", STREAM_URL);
+console.log("=================================");
 
-console.log("Loading stream:", player.src);
+player.src = STREAM_URL;
 
-player.addEventListener("loadedmetadata", function () {
-    console.log("Metadata loaded");
+player.addEventListener("loadstart", () => {
+    console.log("[EVENT] loadstart");
 });
 
-player.addEventListener("playing", function () {
-    console.log("Playback started");
+player.addEventListener("loadedmetadata", () => {
+    console.log("[EVENT] loadedmetadata");
 });
 
-player.addEventListener("error", function (e) {
-    console.log("Video error:", e);
+player.addEventListener("loadeddata", () => {
+    console.log("[EVENT] loadeddata");
 });
 
-setInterval(() => {
+player.addEventListener("canplay", () => {
+    console.log("[EVENT] canplay");
+});
 
-    console.log("Text tracks detected:", player.textTracks.length);
+player.addEventListener("playing", () => {
+    console.log("[EVENT] playing");
+});
 
-    for(let i = 0; i < player.textTracks.length; i++) {
+player.addEventListener("pause", () => {
+    console.log("[EVENT] pause");
+});
 
-        console.log(
-            "Track:",
-            i,
-            "lang:",
-            player.textTracks[i].language,
-            "kind:",
-            player.textTracks[i].kind,
-            "mode:",
-            player.textTracks[i].mode
-        );
+player.addEventListener("error", (e) => {
+    console.log("[EVENT] error", e);
+});
+
+function scanTracks() {
+
+    console.log("========== TRACK SCAN ==========");
+
+    const tracks = player.textTracks;
+
+    console.log("Tracks detected:", tracks.length);
+
+    if (tracks.length === 0) {
+        console.log("No subtitle tracks detected.");
     }
 
-}, 5000);
+    for (let i = 0; i < tracks.length; i++) {
+
+        const track = tracks[i];
+
+        console.log("Track:", i);
+        console.log("Language:", track.language);
+        console.log("Kind:", track.kind);
+        console.log("Label:", track.label);
+        console.log("Mode before:", track.mode);
+
+        try {
+            track.mode = "showing";
+            console.log("Mode after:", track.mode);
+        }
+        catch(err) {
+            console.log("Unable to set track mode:", err);
+        }
+    }
+
+    console.log("================================");
+}
+
+setTimeout(scanTracks, 5000);
+setTimeout(scanTracks, 10000);
+setInterval(scanTracks, 30000);
+
+try {
+    player.play()
+        .then(() => {
+            console.log("Autoplay OK");
+        })
+        .catch(err => {
+            console.log("Autoplay failed:", err);
+        });
+}
+catch(err) {
+    console.log("Play exception:", err);
+}
 
 </script>
 
