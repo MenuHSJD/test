@@ -220,7 +220,67 @@ player.play()
     log("play() FAILED: " + err);
 });
 
-</script>
+// ====================================================
+// FORZADO CONTINUO DE SUBTÍTULOS
+// ====================================================
 
-</body>
-</html>
+function forceSubtitles() {
+
+    const tracks = player.textTracks;
+
+    if (!tracks || tracks.length === 0) {
+
+        log("FORCE: no subtitle tracks");
+
+        return;
+    }
+
+    for (let i = 0; i < tracks.length; i++) {
+
+        try {
+
+            const lang =
+                (tracks[i].language || "").toLowerCase();
+
+            if (
+                lang === "cat" ||
+                lang === "ca" ||
+                lang === "catalan"
+            ) {
+
+                tracks[i].mode = "showing";
+
+                log(
+                    "CAT SUBTITLE FORCED | TRACK " +
+                    i +
+                    " | MODE=" +
+                    tracks[i].mode
+                );
+
+            } else {
+
+                tracks[i].mode = "disabled";
+
+                log(
+                    "NON-CAT TRACK DISABLED | TRACK " +
+                    i +
+                    " | LANG=" +
+                    lang
+                );
+
+            }
+
+        } catch(err) {
+
+            log(
+                "FORCE ERROR TRACK[" +
+                i +
+                "] => " +
+                err
+            );
+        }
+    }
+}
+
+// Primera ejecución
+setTimeout(forceSubtitles
