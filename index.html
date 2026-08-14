@@ -66,7 +66,7 @@ player.src = STREAM_URL;
     "error"
 ].forEach(evt => {
 
-    player.addEventListener(evt, function() {
+    player.addEventListener(evt, function(e) {
 
         log(
             "EVENT: " + evt +
@@ -220,45 +220,7 @@ player.play()
     log("play() FAILED: " + err);
 });
 
-// ====================================
-// FORZADO SIMPLE DE SUBTÍTULOS
-// ====================================
+</script>
 
-function forceSubtitles() {
-
-    try {
-
-        if (!player.textTracks) {
-            return;
-        }
-
-        for (let i = 0; i < player.textTracks.length; i++) {
-
-            try {
-
-                player.textTracks[i].mode = "showing";
-
-                log(
-                    "FORCE TRACK[" + i + "] " +
-                    "LANG=" + player.textTracks[i].language +
-                    " MODE=" + player.textTracks[i].mode
-                );
-
-            } catch(e) {
-
-                log(
-                    "FORCE ERROR TRACK[" + i + "] " + e
-                );
-            }
-        }
-
-    } catch(err) {
-
-        log("FORCE SUBTITLE ERROR " + err);
-    }
-}
-
-// Comenzar a forzar 2 segundos después
-setTimeout(forceSubtitles, 2000);
-
-// Mantener activas las pistas 
+</body>
+</html>
