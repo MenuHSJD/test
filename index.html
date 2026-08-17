@@ -21,7 +21,6 @@ html, body {
     width: 100%;
     height: 100%;
     object-fit: contain;
-    z-index: -1;
 }
 </style>
 </head>
@@ -30,7 +29,6 @@ html, body {
 
 <video
     id="player"
-    style="z-index:-1;"
     hwz="z-index:-1"
     autoplay
     preferredcaptions="pid=1720;lang=cat">
@@ -55,9 +53,14 @@ player.addEventListener("error", (e) => {
     console.log("video error", e);
 });
 
+setTimeout(() => {
+    player.style.visibility = "visible";
+}, 1000);
+
 player.play();
 
 </script>
 
 </body>
 </html>
+``
