@@ -14,17 +14,13 @@ html, body {
     background: black;
 }
 
-/* Vídeo muy pequeño en una esquina */
-
 #player {
     position: absolute;
-    left: 50px;
-    top: 50px;
-    width: 400px;
-    height: 300px;
-    background: black;
-    object-fit: contain;
-    border: 3px solid red;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: fill;
 }
 </style>
 </head>
@@ -54,25 +50,19 @@ function dumpTracks() {
 
         const t = player.textTracks[i];
 
-        console.log(
-            "TEXT[" + i + "]" +
-            " language=" + t.language +
-            " kind=" + t.kind +
-            " label=" + t.label +
-            " mode=" + t.mode
-        );
-
         try {
             t.mode = "showing";
         } catch(e) {
             console.log(e);
         }
+
     }
 }
 
 setTimeout(dumpTracks, 5000);
 setTimeout(dumpTracks, 10000);
 setTimeout(dumpTracks, 20000);
+
 setInterval(dumpTracks, 30000);
 
 player.play();
