@@ -10,15 +10,18 @@ html, body {
     padding: 0;
     width: 100%;
     height: 100%;
-    background: black;
     overflow: hidden;
+    background: transparent;
 }
 
 #player {
+    position: absolute;
+    top: 0;
+    left: 0;
     width: 100%;
     height: 100%;
-    background: black;
     object-fit: contain;
+    z-index: 0;
 }
 </style>
 </head>
@@ -27,7 +30,7 @@ html, body {
 
 <video
     id="player"
-    hwz="z-index:-2"
+    hwz="z-index:-1"
     autoplay
     controls
     preferredcaptions="pid=1720;lang=cat">
@@ -42,10 +45,7 @@ player.src = STREAM_URL;
 
 function dumpTracks() {
 
-    console.log(
-        "textTracks.length = " +
-        player.textTracks.length
-    );
+    console.log("textTracks.length = " + player.textTracks.length);
 
     for (let i = 0; i < player.textTracks.length; i++) {
 
