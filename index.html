@@ -14,12 +14,11 @@ html, body {
 
     overflow: hidden;
 
-    background: transparent;
+    background: white;
 }
 
-#iptv-wrapper {
+#iptvzone {
     position: absolute;
-
     left: 0;
     top: 0;
 
@@ -28,12 +27,11 @@ html, body {
 
     overflow: hidden;
 
-    background: transparent;
+    background: white;
 }
 
 #player {
     position: absolute;
-
     left: 0;
     top: 0;
 
@@ -42,18 +40,54 @@ html, body {
 
     object-fit: fill;
 
-    background: transparent;
+    background: white;
+    overflow: hidden;
+}
+
+/* Estilo de subtítulos */
+#player::cue {
+    color: yellow;
+    background: rgba(0, 0, 0, 0.85);
+
+    font-size: 4.2vh;
+    line-height: 1.1;
+
+    font-family: Arial, sans-serif;
+    font-weight: bold;
+}
+
+#player::-webkit-media-text-track-container {
+    position: absolute !important;
+
+    left: 0 !important;
+    top: 0 !important;
+
+    width: 100% !important;
+    height: 100% !important;
+
+    overflow: hidden !important;
+
+    transform: none !important;
+}
+
+#player::-webkit-media-text-track-display {
+    max-width: 92% !important;
+    margin-left: auto !important;
+    margin-right: auto !important;
+
+    font-size: 4.2vh !important;
+    line-height: 1.1 !important;
 }
 </style>
 </head>
 
 <body>
 
-<div id="iptv-wrapper">
+<div id="iptvzone">
 
     <video
         id="player"
-        hwz="z-index:-2"
+        hwz="off"
         autoplay
         muted
         preferredcaptions="pid=1720;lang=cat">
