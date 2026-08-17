@@ -14,6 +14,15 @@ html, body {
     background: black;
 }
 
+#iptvzone {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+}
+
 #player {
     position: absolute;
     left: 0;
@@ -27,6 +36,8 @@ html, body {
 
 <body>
 
+<div id="iptvzone">
+
 <video
     id="player"
     hwz="off"
@@ -35,35 +46,39 @@ html, body {
     preferredcaptions="pid=1720;lang=cat">
 </video>
 
+</div>
+
 <script>
 
 const STREAM_URL = "udp://239.255.0.15:1234";
+
 const player = document.getElementById("player");
 
 player.src = STREAM_URL;
 
-function dumpTracks() {
+function forceTracks() {
 
-    console.log("textTracks.length = " + player.textTracks.length);
+    try {
 
-    for (let i = 0; i < player.textTracks.length; i++) {
+        for (let i = 0; i < player.textTracks.length; i++) {
 
-        const t = player.textTracks[i];
+            player.textTracks[i].mode = "showing";
 
-        try {
-            t.mode = "showing";
-        } catch(e) {
-            console.log(e);
         }
 
+    } catch(e) {
+
+        console.log(e);
+
     }
+
 }
 
-setTimeout(dumpTracks, 5000);
-setTimeout(dumpTracks, 10000);
-setTimeout(dumpTracks, 20000);
+setTimeout(forceTracks, 5000);
+setTimeout(forceTracks, 10000);
+setTimeout(forceTracks, 15000);
 
-setInterval(dumpTracks, 30000);
+setInterval(forceTracks, 10000);
 
 player.play();
 
