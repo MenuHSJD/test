@@ -2,7 +2,7 @@
 <html>
 <head>
 <meta charset="utf-8">
-<title>HSJD IPTV DVB Diagnostics</title>
+<title>HSJD IPTV DVB</title>
 
 <style>
 html, body {
@@ -14,85 +14,123 @@ html, body {
     background: black;
 }
 
-#iptv-wrapper {
+#iptvzone {
     position: absolute;
-    top: 0;
     left: 0;
+    top: 0;
+
     width: 100%;
     height: 100%;
 
     overflow: hidden;
     background: black;
+
+    contain: strict;
 }
 
 #player {
     position: absolute;
-    top: 0;
     left: 0;
+    top: 0;
 
     width: 100%;
     height: 100%;
 
-    object-fit: contain;
+    object-fit: fill;
+
     background: black;
+    overflow: hidden;
+}
+
+/* Intento de controlar la capa de subtítulos del motor Chromium/BrightSign */
+#player::cue {
+    color: white;
+    background: rgba(0, 0, 0, 0.78);
+
+    font-size: 4.2vh;
+    line-height: 1.1;
+
+    font-family: Arial, sans-serif;
+    font-weight: bold;
+}
+
+/* Contenedor interno de subtítulos HTML5/WebKit */
+#player::-webkit-media-text-track-container {
+    position: absolute !important;
+
+    left: 0 !important;
+    top: 0 !important;
+
+    width: 100% !important;
+    height: 100% !important;
+
+    overflow: hidden !important;
+
+    transform: none !important;
+}
+
+#player::-webkit-media-text-track-display {
+    max-width: 92% !important;
+    margin-left: auto !important;
+    margin-right: auto !important;
+
+    font-size: 4.2vh !important;
+    line-height: 1.1 !important;
 }
 </style>
 </head>
 
 <body>
 
-<div id="iptv-wrapper">
+<div id="iptvzone">
 
     <video
         id="player"
-        hwz="z-index:-2"
+        hwz="off"
         autoplay
-        controls
+        muted
         preferredcaptions="pid=1720;lang=cat">
     </video>
 
 </div>
 
 <script>
-
 const STREAM_URL = "udp://239.255.0.15:1234";
 const player = document.getElementById("player");
 
 player.src = STREAM_URL;
 
-function dumpTracks() {
-
-    console.log("textTracks.length = " + player.textTracks.length);
-
-    for (let i = 0; i < player.textTracks.length; i++) {
-
-        const t = player.textTracks[i];
-
-        console.log(
-            "TEXT[" + i + "]" +
-            " language=" + t.language +
-            " kind=" + t.kind +
-            " label=" + t.label +
-            " mode=" + t.mode
-        );
-
-        try {
-            t.mode = "showing";
+function forceCaptions() {
+    try {
+        for (let i = 0; i < player.textTracks.length; i++) {
+            player.textTracks[i].mode = "showing";
         }
-        catch(e) {
-            console.log(e);
-        }
+    } catch(e) {
+        console.log(e);
     }
 }
 
-setTimeout(dumpTracks, 5000);
-setTimeout(dumpTracks, 10000);
-setTimeout(dumpTracks, 20000);
+player.addEventListener("loadedmetadata", () => {
+    forceCaptions();
+    player.play();
+});
 
-setInterval(dumpTracks, 30000);
+player.addEventListener("playing", () => {
+    forceCaptions();
+});
+
+player.addEventListener("error", (e) => {
+    console.log("video error", e);
+});
+
+setTimeout(forceCaptions, 3000);
+setTimeout(forceCaptions, 6000);
+setTimeout(forceCaptions, 10000);
+setTimeout(forceCaptions, 15000);
+
+setInterval(forceCaptions, 5000);
 
 player.play();
-
 </script>
 
 </body>
