@@ -2,36 +2,38 @@
 <html>
 <head>
 <meta charset="utf-8">
-<title>HSJD IPTV DVB</title>
+<title>HSJD IPTV DVB Diagnostics</title>
 
 <style>
 html, body {
     margin: 0;
     padding: 0;
-    width: 100vw;
-    height: 100vh;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    background: black;
+}
+
+#iptv-wrapper {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+
     overflow: hidden;
     background: black;
 }
 
 #player {
-    position: fixed;
-    left: 0;
+    position: absolute;
     top: 0;
+    left: 0;
 
-    width: 100vw !important;
-    height: 100vh !important;
+    width: 100%;
+    height: 100%;
 
-    min-width: 100vw;
-    min-height: 100vh;
-
-    max-width: 100vw;
-    max-height: 100vh;
-
-    object-fit: fill;
-
-    display: block;
-
+    object-fit: contain;
     background: black;
 }
 </style>
@@ -39,45 +41,58 @@ html, body {
 
 <body>
 
-<video
-    id="player"
-    src="udp://239.255.0.15:1234"
-    hwz="off"
-    autoplay
-    muted
-    playsinline
-    webkit-playsinline
-    preload="auto"
-    preferredcaptions="pid=1720;lang=cat">
-</video>
+<div id="iptv-wrapper">
+
+    <video
+        id="player"
+        hwz="z-index:-2"
+        autoplay
+        controls
+        preferredcaptions="pid=1720;lang=cat">
+    </video>
+
+</div>
 
 <script>
+
+const STREAM_URL = "udp://239.255.0.15:1234";
 const player = document.getElementById("player");
 
-function forceCaptions() {
-    try {
-        for (let i = 0; i < player.textTracksnction () {
-    console.log("metadata loaded");
-    forceCaptions();
-    player.play();
-});
+player.src = STREAM_URL;
 
-player.addEventListener("playing", function () {
-    console.log("playing");
-    forceCaptions();
-});
+function dumpTracks() {
 
-player.addEventListener("error", function (e) {
-    console.log("video error", e);
-});
+    console.log("textTracks.length = " + player.textTracks.length);
 
-setTimeout(forceCaptions, 3000);
-setTimeout(forceCaptions, 6000);
-setTimeout(forceCaptions, 10000);
+    for (let i = 0; i < player.textTracks.length; i++) {
 
-setInterval(forceCaptions, 5000);
+        const t = player.textTracks[i];
+
+        console.log(
+            "TEXT[" + i + "]" +
+            " language=" + t.language +
+            " kind=" + t.kind +
+            " label=" + t.label +
+            " mode=" + t.mode
+        );
+
+        try {
+            t.mode = "showing";
+        }
+        catch(e) {
+            console.log(e);
+        }
+    }
+}
+
+setTimeout(dumpTracks, 5000);
+setTimeout(dumpTracks, 10000);
+setTimeout(dumpTracks, 20000);
+
+setInterval(dumpTracks, 30000);
 
 player.play();
+
 </script>
 
 </body>
