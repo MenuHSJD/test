@@ -8,14 +8,18 @@
 html, body {
     margin: 0;
     padding: 0;
+
     width: 100%;
     height: 100%;
+
     overflow: hidden;
-    background: black;
+
+    background: rgba(0, 0, 0, 0);
 }
 
-#iptvzone {
+#iptv-wrapper {
     position: absolute;
+
     left: 0;
     top: 0;
 
@@ -23,13 +27,13 @@ html, body {
     height: 100%;
 
     overflow: hidden;
-    background: black;
 
-    contain: strict;
+    background: rgba(0, 0, 0, 0);
 }
 
 #player {
     position: absolute;
+
     left: 0;
     top: 0;
 
@@ -38,55 +42,18 @@ html, body {
 
     object-fit: fill;
 
-    background: black;
-    overflow: hidden;
-}
-
-/* Intento de controlar la capa de subtítulos del motor Chromium/BrightSign */
-#player::cue {
-    color: white;
-    background: rgba(0, 0, 0, 0.78);
-
-    font-size: 4.2vh;
-    line-height: 1.1;
-
-    font-family: Arial, sans-serif;
-    font-weight: bold;
-}
-
-/* Contenedor interno de subtítulos HTML5/WebKit */
-#player::-webkit-media-text-track-container {
-    position: absolute !important;
-
-    left: 0 !important;
-    top: 0 !important;
-
-    width: 100% !important;
-    height: 100% !important;
-
-    overflow: hidden !important;
-
-    transform: none !important;
-}
-
-#player::-webkit-media-text-track-display {
-    max-width: 92% !important;
-    margin-left: auto !important;
-    margin-right: auto !important;
-
-    font-size: 4.2vh !important;
-    line-height: 1.1 !important;
+    background: rgba(0, 0, 0, 0);
 }
 </style>
 </head>
 
 <body>
 
-<div id="iptvzone">
+<div id="iptv-wrapper">
 
     <video
         id="player"
-        hwz="off"
+        hwz="z-index:-1"
         autoplay
         muted
         preferredcaptions="pid=1720;lang=cat">
@@ -110,16 +77,16 @@ function forceCaptions() {
     }
 }
 
-player.addEventListener("loadedmetadata", () => {
+player.addEventListener("loadedmetadata", function () {
     forceCaptions();
     player.play();
 });
 
-player.addEventListener("playing", () => {
+player.addEventListener("playing", function () {
     forceCaptions();
 });
 
-player.addEventListener("error", (e) => {
+player.addEventListener("error", function (e) {
     console.log("video error", e);
 });
 
