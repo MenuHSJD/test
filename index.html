@@ -67,35 +67,19 @@ const player = document.getElementById("player");
 
 player.src = STREAM_URL;
 
-function forceCaptions() {
+player.addEventListener("loadedmetadata", function () {
+
     try {
+
         for (let i = 0; i < player.textTracks.length; i++) {
             player.textTracks[i].mode = "showing";
         }
+
     } catch(e) {
         console.log(e);
     }
-}
 
-player.addEventListener("loadedmetadata", function () {
-    forceCaptions();
-    player.play();
 });
-
-player.addEventListener("playing", function () {
-    forceCaptions();
-});
-
-player.addEventListener("error", function (e) {
-    console.log("video error", e);
-});
-
-setTimeout(forceCaptions, 3000);
-setTimeout(forceCaptions, 6000);
-setTimeout(forceCaptions, 10000);
-setTimeout(forceCaptions, 15000);
-
-setInterval(forceCaptions, 5000);
 
 player.play();
 </script>
